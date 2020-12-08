@@ -8,11 +8,13 @@ var Action;
     Action[Action["SESSION_LIST"] = 2] = "SESSION_LIST";
     Action[Action["PERSON"] = 3] = "PERSON";
     Action[Action["PERSON_LIST"] = 4] = "PERSON_LIST";
-    Action[Action["PLACE"] = 5] = "PLACE";
-    Action[Action["PLACE_LIST"] = 6] = "PLACE_LIST";
-    Action[Action["CONTINUE"] = 7] = "CONTINUE";
-    Action[Action["ADD"] = 8] = "ADD";
-    Action[Action["NONE"] = 9] = "NONE";
+    Action[Action["LORE"] = 5] = "LORE";
+    Action[Action["LORE_LIST"] = 6] = "LORE_LIST";
+    Action[Action["PLACE"] = 7] = "PLACE";
+    Action[Action["PLACE_LIST"] = 8] = "PLACE_LIST";
+    Action[Action["CONTINUE"] = 9] = "CONTINUE";
+    Action[Action["ADD"] = 10] = "ADD";
+    Action[Action["NONE"] = 11] = "NONE";
 })(Action = exports.Action || (exports.Action = {}));
 var parseArgs = function (input) {
     var _a = input.split(" "), actionString = _a[0], args = _a.slice(1);
@@ -20,31 +22,35 @@ var parseArgs = function (input) {
         case "!recap":
         case "!last":
             return { action: Action.RECAP, args: args };
-        case "!session":
-        case "!sn":
-            return { action: Action.SESSION, args: args };
         case "!when":
+        case "!session":
         case "!sessions":
         case "!sl":
-            return { action: Action.SESSION_LIST, args: args };
+        case "!sn":
+            return {
+                action: args.length ? Action.SESSION : Action.SESSION_LIST,
+                args: args,
+            };
+        case "!who":
         case "!person":
         case "!people":
-        case "!who":
-            return { action: args.length ? Action.PERSON : Action.PERSON_LIST, args: args };
         case "!pe":
-            return { action: Action.PERSON_LIST, args: args };
-        case "!place":
-        case "!pn":
-            return { action: Action.PLACE, args: args };
+            return { action: args.length ? Action.PERSON : Action.PERSON_LIST, args: args };
+        case "!what":
+        case "!lore":
+        case "!lo":
+            return { action: args.length ? Action.LORE : Action.LORE_LIST, args: args };
         case "!where":
         case "!places":
+        case "!place":
         case "!pl":
-            return { action: Action.PLACE_LIST, args: args };
+            return { action: args.length ? Action.PLACE : Action.PLACE_LIST, args: args };
         case "!...":
         case "!more":
         case "!continue":
             return { action: Action.CONTINUE, args: args };
         case "!add":
+            return { action: Action.ADD, args: args };
         case "!new":
             return { action: Action.ADD, args: args };
         default:

@@ -21,22 +21,28 @@ bot.on("message", (m) => {
 
     switch (action) {
       case Action.RECAP:
-        m.reply(API.session());
+        m.reply(API.lastSession());
         break;
       case Action.SESSION:
-        m.reply(API.session(args[0]));
+        m.reply(API.sessions(args[0]));
         break;
       case Action.SESSION_LIST:
         m.reply(API.sessions());
         break;
       case Action.PERSON:
-        m.reply(API.person(args[0]));
+        m.reply(API.people(args[0]));
         break;
       case Action.PERSON_LIST:
         m.reply(API.people());
         break;
+      case Action.LORE:
+        m.reply(API.lore(args[0]));
+        break;
+      case Action.LORE_LIST:
+        m.reply(API.lore());
+        break;
       case Action.PLACE:
-        m.reply(API.place(args[0]));
+        m.reply(API.places(args[0]));
         break;
       case Action.PLACE_LIST:
         m.reply(API.places());

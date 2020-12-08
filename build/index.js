@@ -41,22 +41,28 @@ bot.on("message", function (m) {
         var _a = parser_1.parseArgs(m.content), action = _a.action, args = _a.args;
         switch (action) {
             case parser_1.Action.RECAP:
-                m.reply(api_1.default.session());
+                m.reply(api_1.default.lastSession());
                 break;
             case parser_1.Action.SESSION:
-                m.reply(api_1.default.session(args[0]));
+                m.reply(api_1.default.sessions(args[0]));
                 break;
             case parser_1.Action.SESSION_LIST:
                 m.reply(api_1.default.sessions());
                 break;
             case parser_1.Action.PERSON:
-                m.reply(api_1.default.person(args[0]));
+                m.reply(api_1.default.people(args[0]));
                 break;
             case parser_1.Action.PERSON_LIST:
                 m.reply(api_1.default.people());
                 break;
+            case parser_1.Action.LORE:
+                m.reply(api_1.default.lore(args[0]));
+                break;
+            case parser_1.Action.LORE_LIST:
+                m.reply(api_1.default.lore());
+                break;
             case parser_1.Action.PLACE:
-                m.reply(api_1.default.place(args[0]));
+                m.reply(api_1.default.places(args[0]));
                 break;
             case parser_1.Action.PLACE_LIST:
                 m.reply(api_1.default.places());

@@ -4,20 +4,30 @@ import path from "path";
 const SESSIONS_PATH = path.join(__dirname, "../../src/content/sessions");
 const PEOPLE_PATH = path.join(__dirname, "../../src/content/people");
 const PLACES_PATH = path.join(__dirname, "../../src/content/places");
+const LORE_PATH = path.join(__dirname, "../../src/content/lore");
+
+export enum DocType {
+  SESSION,
+  PERSON,
+  PLACE,
+  LORE,
+}
 
 interface Bookmark {
   path: PathLike;
   page: number;
 }
 
+type SortCallback = (a: string, b: string) => number;
+
 let bookmark: Bookmark | null;
 
-const backtickify = (data: string): string => `\`\`\`md
+const markdown = (data: string): string => `\`\`\`md
 ${data}
 \`\`\``;
 
 const help = () =>
-  backtickify(`
+  markdown(`
 USAGE: !sb [CATEGORY] QUERY
 `);
 
@@ -29,10 +39,10 @@ const read = (path: PathLike, page: number = 0): string => {
 
   if (hasNextPage) {
     bookmark = { path, page: page + 1 };
-    return backtickify(file.slice(thisPage, nextPage) + "...");
+    return markdown(file.slice(thisPage, nextPage) + "...");
   } else {
     bookmark = null;
-    return backtickify(file.slice(thisPage));
+    return markdown(file.slice(thisPage));
   }
 };
 
@@ -40,100 +50,85 @@ const more = (): string => {
   if (bookmark) {
     return read(bookmark.path, bookmark.page);
   } else {
-    return backtickify("Nothing left to continue.");
+    return markdown("Nothing left to read.");
   }
 };
 
-// const list = (path: pathLike): string => {
+const list = (docPath: string, sorter: SortCallback): string => {
+  try {
+    const documents = fs
+      .readdirSync(docPath)
+      .sort(sorter)
+      .map((docName, i) => `${i + 1}. ${docName}`);
+    return markdown(documents.toString().replace(/\.md/g, "").replace(/,/g, "\n"));
+  } catch (e) {
+    return markdown(e.message);
+  }
+};
 
-// }
+const show = (name: string, docPath: string): string => {
+  try {
+    const documents = fs.readdirSync(docPath);
+    const match = documents.filter((docName) =>
+      docName.toLowerCase().includes(name)
+    );
+    if (!match.length) return markdown(`Could not find **${name}**`);
+    return read(path.join(docPath, match[0]));
+  } catch (e) {
+    return markdown(e.message);
+  }
+};
 
-const session = (numOrDate?: string): string => {
+const sessions = (numOrDate?: string): string => {
+  const sorter: SortCallback = (a, b) =>
+    new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
+
+  if (!numOrDate) return list(SESSIONS_PATH, sorter);
+
   try {
     const num = numOrDate ? parseInt(numOrDate) - 1 : 0;
-    const sessions = fs
+    const sessions = fs.readdirSync(SESSIONS_PATH).sort(sorter);
+    const session = sessions[num ?? sessions.length - 1] ?? "";
+    return read(path.join(SESSIONS_PATH, session));
+  } catch (e) {
+    return markdown(e.message);
+  }
+};
+
+const lastSession = () => {
+  try {
+    const last = fs
       .readdirSync(SESSIONS_PATH)
       .sort(
         (a, b) =>
-          new Date(a.split(".")[0]).getTime() -
-          new Date(b.split(".")[0]).getTime()
-      );
-      const session = sessions[num || sessions.length - 1] ?? "";
-      console.log(sessions, num, session);
-    return read(path.join(SESSIONS_PATH, session));
+          new Date(b.split(".")[0]).getTime() -
+          new Date(a.split(".")[0]).getTime()
+      )[0];
+    return read(path.join(SESSIONS_PATH, last));
   } catch (e) {
-    return backtickify(e.message);
+    return markdown(e.message);
   }
 };
 
-const sessions = (): string => {
-  try {
-    const sessions = fs.readdirSync(SESSIONS_PATH);
-    const sorted = sessions
-      .sort(
-        (a, b) =>
-          new Date(a.split(".")[0]).getTime() -
-          new Date(b.split(".")[0]).getTime()
-      )
-      .map((s, i) => `${i + 1}. ${s}`);
-    return backtickify(sorted.toString().replace(/,/g, "\n"));
-  } catch (e) {
-    return backtickify(e.message);
-  }
+const people = (name?: string): string => {
+  if (name) return show(name, PEOPLE_PATH);
+
+  const sorter: SortCallback = (a, b) => a.localeCompare(b);
+  return list(PEOPLE_PATH, sorter);
 };
 
-const person = (name: string): string => {
-  try {
-    const people = fs.readdirSync(PEOPLE_PATH);
-    const match = people.filter((person) =>
-      person.toLowerCase().includes(name)
-    );
-    if (!match.length) {
-      return backtickify(`Could not find **${name}**`);
-    }
+const places = (name?: string): string => {
+  if (name) return show(name, PLACES_PATH);
 
-    return read(path.join(PEOPLE_PATH, match[0]));
-  } catch (e) {
-    return backtickify(e.message);
-  }
+  const sorter: SortCallback = (a, b) => a.localeCompare(b);
+  return list(PLACES_PATH, sorter);
 };
 
-const people = (): string => {
-  try {
-    const sessions = fs.readdirSync(PEOPLE_PATH);
-    const sorted = sessions
-      .sort((a, b) => a.localeCompare(b))
-      .map((s, i) => `${i + 1}. ${s}`);
-    return backtickify(sorted.toString().replace(",", "\n"));
-  } catch (e) {
-    return backtickify(e.message);
-  }
+const lore = (name?: string): string => {
+  if (name) return show(name, LORE_PATH);
+
+  const sorter: SortCallback = (a, b) => a.localeCompare(b);
+  return list(LORE_PATH, sorter);
 };
 
-const place = (name: string): string => {
-  try {
-    const places = fs.readdirSync(PLACES_PATH);
-    const match = places.filter((place) => place.toLowerCase().includes(name));
-    if (!match.length) {
-      return backtickify(`Could not find **${name}**`);
-    }
-
-    return read(path.join(PLACES_PATH, match[0]));
-  } catch (e) {
-    return backtickify(e.message);
-  }
-};
-
-const places = (): string => {
-  try {
-    const places = fs.readdirSync(PLACES_PATH);
-    const sorted = places
-      .sort((a, b) => a.localeCompare(b))
-      .map((s, i) => `${i + 1}. ${s}`);
-    return backtickify(sorted.toString().replace(",", "\n"));
-  } catch (e) {
-    return backtickify(e.message);
-  }
-};
-
-export default { help, more, session, sessions, person, people, place, places };
+export default { help, more, sessions, lastSession, people, places, lore };

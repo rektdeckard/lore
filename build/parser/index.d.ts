@@ -4,11 +4,13 @@ export declare enum Action {
     SESSION_LIST = 2,
     PERSON = 3,
     PERSON_LIST = 4,
-    PLACE = 5,
-    PLACE_LIST = 6,
-    CONTINUE = 7,
-    ADD = 8,
-    NONE = 9
+    LORE = 5,
+    LORE_LIST = 6,
+    PLACE = 7,
+    PLACE_LIST = 8,
+    CONTINUE = 9,
+    ADD = 10,
+    NONE = 11
 }
 export interface Command {
     action: Action;

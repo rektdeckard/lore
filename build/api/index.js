@@ -3,15 +3,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.DocType = void 0;
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var SESSIONS_PATH = path_1.default.join(__dirname, "../../src/content/sessions");
 var PEOPLE_PATH = path_1.default.join(__dirname, "../../src/content/people");
 var PLACES_PATH = path_1.default.join(__dirname, "../../src/content/places");
+var LORE_PATH = path_1.default.join(__dirname, "../../src/content/lore");
+var DocType;
+(function (DocType) {
+    DocType[DocType["SESSION"] = 0] = "SESSION";
+    DocType[DocType["PERSON"] = 1] = "PERSON";
+    DocType[DocType["PLACE"] = 2] = "PLACE";
+    DocType[DocType["LORE"] = 3] = "LORE";
+})(DocType = exports.DocType || (exports.DocType = {}));
 var bookmark;
-var backtickify = function (data) { return "```md\n" + data + "\n```"; };
+var markdown = function (data) { return "```md\n" + data + "\n```"; };
 var help = function () {
-    return backtickify("\nUSAGE: !sb [CATEGORY] QUERY\n");
+    return markdown("\nUSAGE: !sb [CATEGORY] QUERY\n");
 };
 var read = function (path, page) {
     if (page === void 0) { page = 0; }
@@ -21,11 +30,11 @@ var read = function (path, page) {
     var hasNextPage = file.length >= nextPage;
     if (hasNextPage) {
         bookmark = { path: path, page: page + 1 };
-        return backtickify(file.slice(thisPage, nextPage) + "...");
+        return markdown(file.slice(thisPage, nextPage) + "...");
     }
     else {
         bookmark = null;
-        return backtickify(file.slice(thisPage));
+        return markdown(file.slice(thisPage));
     }
 };
 var more = function () {
@@ -33,95 +42,83 @@ var more = function () {
         return read(bookmark.path, bookmark.page);
     }
     else {
-        return backtickify("Nothing left to continue.");
+        return markdown("Nothing left to read.");
     }
 };
-// const list = (path: pathLike): string => {
-// }
-var session = function (numOrDate) {
+var list = function (docPath, sorter) {
+    try {
+        var documents = fs_1.default
+            .readdirSync(docPath)
+            .sort(sorter)
+            .map(function (docName, i) { return i + 1 + ". " + docName; });
+        return markdown(documents.toString().replace(/\.md/g, "").replace(/,/g, "\n"));
+    }
+    catch (e) {
+        return markdown(e.message);
+    }
+};
+var show = function (name, docPath) {
+    try {
+        var documents = fs_1.default.readdirSync(docPath);
+        var match = documents.filter(function (docName) {
+            return docName.toLowerCase().includes(name);
+        });
+        if (!match.length)
+            return markdown("Could not find **" + name + "**");
+        return read(path_1.default.join(docPath, match[0]));
+    }
+    catch (e) {
+        return markdown(e.message);
+    }
+};
+var sessions = function (numOrDate) {
     var _a;
+    var sorter = function (a, b) {
+        return new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
+    };
+    if (!numOrDate)
+        return list(SESSIONS_PATH, sorter);
     try {
         var num = numOrDate ? parseInt(numOrDate) - 1 : 0;
-        var sessions_1 = fs_1.default
+        var sessions_1 = fs_1.default.readdirSync(SESSIONS_PATH).sort(sorter);
+        var session = (_a = sessions_1[num !== null && num !== void 0 ? num : sessions_1.length - 1]) !== null && _a !== void 0 ? _a : "";
+        return read(path_1.default.join(SESSIONS_PATH, session));
+    }
+    catch (e) {
+        return markdown(e.message);
+    }
+};
+var lastSession = function () {
+    try {
+        var last = fs_1.default
             .readdirSync(SESSIONS_PATH)
             .sort(function (a, b) {
-            return new Date(a.split(".")[0]).getTime() -
-                new Date(b.split(".")[0]).getTime();
-        });
-        var session_1 = (_a = sessions_1[num || sessions_1.length - 1]) !== null && _a !== void 0 ? _a : "";
-        console.log(sessions_1, num, session_1);
-        return read(path_1.default.join(SESSIONS_PATH, session_1));
+            return new Date(b.split(".")[0]).getTime() -
+                new Date(a.split(".")[0]).getTime();
+        })[0];
+        return read(path_1.default.join(SESSIONS_PATH, last));
     }
     catch (e) {
-        return backtickify(e.message);
+        return markdown(e.message);
     }
 };
-var sessions = function () {
-    try {
-        var sessions_2 = fs_1.default.readdirSync(SESSIONS_PATH);
-        var sorted = sessions_2
-            .sort(function (a, b) {
-            return new Date(a.split(".")[0]).getTime() -
-                new Date(b.split(".")[0]).getTime();
-        })
-            .map(function (s, i) { return i + 1 + ". " + s; });
-        return backtickify(sorted.toString().replace(/,/g, "\n"));
-    }
-    catch (e) {
-        return backtickify(e.message);
-    }
+var people = function (name) {
+    if (name)
+        return show(name, PEOPLE_PATH);
+    var sorter = function (a, b) { return a.localeCompare(b); };
+    return list(PEOPLE_PATH, sorter);
 };
-var person = function (name) {
-    try {
-        var people_1 = fs_1.default.readdirSync(PEOPLE_PATH);
-        var match = people_1.filter(function (person) {
-            return person.toLowerCase().includes(name);
-        });
-        if (!match.length) {
-            return backtickify("Could not find **" + name + "**");
-        }
-        return read(path_1.default.join(PEOPLE_PATH, match[0]));
-    }
-    catch (e) {
-        return backtickify(e.message);
-    }
+var places = function (name) {
+    if (name)
+        return show(name, PLACES_PATH);
+    var sorter = function (a, b) { return a.localeCompare(b); };
+    return list(PLACES_PATH, sorter);
 };
-var people = function () {
-    try {
-        var sessions_3 = fs_1.default.readdirSync(PEOPLE_PATH);
-        var sorted = sessions_3
-            .sort(function (a, b) { return a.localeCompare(b); })
-            .map(function (s, i) { return i + 1 + ". " + s; });
-        return backtickify(sorted.toString().replace(",", "\n"));
-    }
-    catch (e) {
-        return backtickify(e.message);
-    }
+var lore = function (name) {
+    if (name)
+        return show(name, LORE_PATH);
+    var sorter = function (a, b) { return a.localeCompare(b); };
+    return list(LORE_PATH, sorter);
 };
-var place = function (name) {
-    try {
-        var places_1 = fs_1.default.readdirSync(PLACES_PATH);
-        var match = places_1.filter(function (place) { return place.toLowerCase().includes(name); });
-        if (!match.length) {
-            return backtickify("Could not find **" + name + "**");
-        }
-        return read(path_1.default.join(PLACES_PATH, match[0]));
-    }
-    catch (e) {
-        return backtickify(e.message);
-    }
-};
-var places = function () {
-    try {
-        var places_2 = fs_1.default.readdirSync(PLACES_PATH);
-        var sorted = places_2
-            .sort(function (a, b) { return a.localeCompare(b); })
-            .map(function (s, i) { return i + 1 + ". " + s; });
-        return backtickify(sorted.toString().replace(",", "\n"));
-    }
-    catch (e) {
-        return backtickify(e.message);
-    }
-};
-exports.default = { help: help, more: more, session: session, sessions: sessions, person: person, people: people, place: place, places: places };
+exports.default = { help: help, more: more, sessions: sessions, lastSession: lastSession, people: people, places: places, lore: lore };
 //# sourceMappingURL=index.js.map
