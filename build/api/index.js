@@ -19,9 +19,7 @@ var DocType;
 })(DocType = exports.DocType || (exports.DocType = {}));
 var bookmark;
 var markdown = function (data) { return "```md\n" + data + "\n```"; };
-var help = function () {
-    return markdown("\nUSAGE: !sb [CATEGORY] QUERY\n");
-};
+var help = function () { return "\n`!recap`: Show notes for the last game session.\n`!who [NAME]`: List people in the world. With `[NAME]`, show info for them.\n`!what [NAME]`: List elements of lore in the world. With `[NAME]`, show info for a specific one.\n`!where [NAME]`: List places in the world. With `[NAME]`, show info for a specific place.\n`!when [NUMBER]`: List game sessions by date. With `[NUMBER]`, show info for that session.\n"; };
 var read = function (path, page) {
     if (page === void 0) { page = 0; }
     var file = fs_1.default.readFileSync(path).toString("utf-8");

@@ -13,8 +13,9 @@ var Action;
     Action[Action["PLACE"] = 7] = "PLACE";
     Action[Action["PLACE_LIST"] = 8] = "PLACE_LIST";
     Action[Action["CONTINUE"] = 9] = "CONTINUE";
-    Action[Action["ADD"] = 10] = "ADD";
-    Action[Action["NONE"] = 11] = "NONE";
+    Action[Action["HELP"] = 10] = "HELP";
+    Action[Action["ADD"] = 11] = "ADD";
+    Action[Action["NONE"] = 12] = "NONE";
 })(Action = exports.Action || (exports.Action = {}));
 var parseArgs = function (input) {
     var _a = input.split(" "), actionString = _a[0], args = _a.slice(1);
@@ -47,12 +48,13 @@ var parseArgs = function (input) {
             return { action: args.length ? Action.PLACE : Action.PLACE_LIST, args: args };
         case "!...":
         case "!more":
-        case "!continue":
             return { action: Action.CONTINUE, args: args };
         case "!add":
-            return { action: Action.ADD, args: args };
         case "!new":
             return { action: Action.ADD, args: args };
+        case "!h":
+        case "!how":
+            return { action: Action.HELP, args: args };
         default:
             return { action: Action.NONE, args: args };
     }

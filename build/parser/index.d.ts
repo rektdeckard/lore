@@ -9,8 +9,9 @@ export declare enum Action {
     PLACE = 7,
     PLACE_LIST = 8,
     CONTINUE = 9,
-    ADD = 10,
-    NONE = 11
+    HELP = 10,
+    ADD = 11,
+    NONE = 12
 }
 export interface Command {
     action: Action;
