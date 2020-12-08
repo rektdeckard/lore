@@ -9,6 +9,7 @@ export enum Action {
   PLACE,
   PLACE_LIST,
   CONTINUE,
+  HELP,
   ADD,
   NONE,
 }
@@ -49,12 +50,13 @@ export const parseArgs = (input: string): Command => {
       return { action: args.length ? Action.PLACE : Action.PLACE_LIST, args };
     case "!...":
     case "!more":
-    case "!continue":
       return { action: Action.CONTINUE, args };
     case "!add":
-      return { action: Action.ADD, args };
     case "!new":
       return { action: Action.ADD, args };
+    case "!h":
+    case "!how":
+      return { action: Action.HELP, args };
     default:
       return { action: Action.NONE, args };
   }

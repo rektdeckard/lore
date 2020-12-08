@@ -52,6 +52,15 @@ bot.on("message", (m) => {
       case Action.CONTINUE:
         m.reply(API.more());
         break;
+      case Action.HELP:
+        m.reply(API.help());
+        // m.reply({
+        //   embed: new Discord.RichEmbed()
+        //   .setTitle("Lore WikiBot")
+        //   .setDescription(API.help())
+        //   .setColor('DARK_PURPLE')
+        // })
+        break;
       case Action.NONE:
       default:
         break;

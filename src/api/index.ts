@@ -26,10 +26,13 @@ const markdown = (data: string): string => `\`\`\`md
 ${data}
 \`\`\``;
 
-const help = () =>
-  markdown(`
-USAGE: !sb [CATEGORY] QUERY
-`);
+const help = (): string => `
+\`!recap\`: Show notes for the last game session.
+\`!who [NAME]\`: List people in the world. With \`[NAME]\`, show info for them.
+\`!what [NAME]\`: List elements of lore in the world. With \`[NAME]\`, show info for a specific one.
+\`!where [NAME]\`: List places in the world. With \`[NAME]\`, show info for a specific place.
+\`!when [NUMBER]\`: List game sessions by date. With \`[NUMBER]\`, show info for that session.
+`;
 
 const read = (path: PathLike, page: number = 0): string => {
   const file = fs.readFileSync(path).toString("utf-8");
