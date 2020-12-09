@@ -6,6 +6,7 @@ import {
   PLACES_PATH,
   LORE_PATH,
   SESSIONS_PATH,
+  META_PATH,
 } from ".";
 import { ContentType } from "../parser";
 import { Bookmark, SortCallback } from "./types";
@@ -13,7 +14,7 @@ import { Bookmark, SortCallback } from "./types";
 let bookmark: Bookmark | null;
 
 function markdown(data: string): string {
-  return `\`\`\`md\n${data}\n\`\`\``;
+  return `\`\`\`md\n${data}\`\`\``;
 }
 
 function unmark(markdown: string): string {
@@ -35,14 +36,18 @@ function read(path: PathLike, page: number = 0): string {
   }
 }
 
-function list(docPath: string, sorter: SortCallback): string {
+function list(
+  docPath: string,
+  sorter: SortCallback,
+  heading: string = ""
+): string {
   try {
     const documents = fs
       .readdirSync(docPath)
       .sort(sorter)
       .map((docName, i) => `${i + 1}. ${docName}`);
     return markdown(
-      documents.toString().replace(/\.md/g, "").replace(/,/g, "\n")
+      heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n")
     );
   } catch (e) {
     return markdown(e.message);
@@ -84,7 +89,7 @@ export function sessions(numOrDate?: string): string {
   const sorter: SortCallback = (a, b) =>
     new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
 
-  if (!numOrDate) return list(SESSIONS_PATH, sorter);
+  if (!numOrDate) return list(SESSIONS_PATH, sorter, "# Sessions\n\n");
 
   try {
     const num = numOrDate ? parseInt(numOrDate) - 1 : 0;
@@ -114,19 +119,25 @@ export function lastSession(): string {
 export function people(name?: string): string {
   if (name) return show(name, PEOPLE_PATH);
   const sorter: SortCallback = (a, b) => a.localeCompare(b);
-  return list(PEOPLE_PATH, sorter);
+  return list(PEOPLE_PATH, sorter, "# People\n\n");
 }
 
 export function places(name?: string): string {
   if (name) return show(name, PLACES_PATH);
   const sorter: SortCallback = (a, b) => a.localeCompare(b);
-  return list(PLACES_PATH, sorter);
+  return list(PLACES_PATH, sorter, "# Places\n\n");
 }
 
 export function lore(name?: string): string {
   if (name) return show(name, LORE_PATH);
   const sorter: SortCallback = (a, b) => a.localeCompare(b);
-  return list(LORE_PATH, sorter);
+  return list(LORE_PATH, sorter, "# Lore\n\n");
+}
+
+export function meta(name?: string): string {
+  if (name) return show(name, META_PATH);
+  const sorter: SortCallback = (a, b) => a.localeCompare(b);
+  return list(META_PATH, sorter, "# Meta\n\n");
 }
 
 export function add(type: ContentType, args: string[]): string {
@@ -142,4 +153,14 @@ export function add(type: ContentType, args: string[]): string {
   } catch (e) {
     return markdown(e.message);
   }
+}
+
+export function all() {
+  return `\
+${people()}
+${places()}
+${lore()}
+${sessions()}
+${meta()}
+`;
 }

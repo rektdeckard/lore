@@ -20,6 +20,7 @@ const ADD_EXAMPLE = `
 Phil is a real person with thoughts and feelings.
 
 ## Phil's Things
+
 - loving family
 - rewarding job
 - third thing
@@ -33,7 +34,7 @@ const HELP_MESSAGE = {
     // .setAuthor("Lore WikiBot")
     .setTitle("Lore WikiBot Commands")
     .setDescription(
-      "In general, `!<question>` will list the relevant pages, and `!<question> <name>` will pull up the specific page with that name. It will also try to match parts of names, so this:```!who adabr```will bring up the entry for *Adabra Gwynn*, if it exists."
+      "In general, `!<question>` will list the relevant pages, and `!<question> <name>` will pull up the specific page with that name. It will also try to match parts of names, so this: ```!who adabr``` will match the entry for *Adabra Gwynn*. The first match found will be selected."
     )
     .addBlankField()
     .addField("!who", "People in the world", true)
@@ -47,7 +48,7 @@ const HELP_MESSAGE = {
     .addBlankField()
     .addField(
       "!add",
-      `Create a new document of type \`person\`, \`place\`, \`thing\`, or \`session\`. Follows the syntax \`!add <type> <name> <content>\`:${ADD_EXAMPLE}`
+      `Create a new document of type \`person\`, \`place\`, \`thing\`, \`session\`, or \`meta\`. Follows the syntax \`!add <type> <name> <content>\`:${ADD_EXAMPLE}`
     ),
 };
 
@@ -84,6 +85,12 @@ bot.on("message", (message) => {
         break;
       case Action.PLACE_LIST:
         message.reply(API.places());
+        break;
+      case Action.META:
+        message.reply(API.meta(args[0]));
+        break;
+      case Action.ALL_LIST:
+        message.reply(API.all());
         break;
       case Action.ADD:
         message.reply(API.add(type!!, args));

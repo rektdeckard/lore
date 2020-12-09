@@ -6,5 +6,6 @@ export const SESSIONS_PATH = path.join(CONTENT_PATH, "sessions");
 export const PEOPLE_PATH = path.join(CONTENT_PATH, "people");
 export const PLACES_PATH = path.join(CONTENT_PATH, "places");
 export const LORE_PATH = path.join(CONTENT_PATH, "lore");
+export const META_PATH = path.join(CONTENT_PATH, "meta");
 
 export default Handlers;

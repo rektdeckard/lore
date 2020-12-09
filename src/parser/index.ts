@@ -8,6 +8,8 @@ export enum Action {
   LORE_LIST,
   PLACE,
   PLACE_LIST,
+  ALL_LIST,
+  META,
   CONTINUE,
   HELP,
   ADD,
@@ -19,6 +21,7 @@ export enum ContentType {
   PLACES = "places",
   LORE = "lore",
   SESSIONS = "sessions",
+  META = "meta",
 }
 
 export interface Command {
@@ -56,6 +59,13 @@ export function parseArgs(input: string): Command {
     case "!place":
     case "!pl":
       return { action: args.length ? Action.PLACE : Action.PLACE_LIST, args };
+    case "!rules":
+    case "!meta":
+    case "!why":
+      return { action: Action.META, args };
+    case "!all":
+    case "!list":
+      return { action: Action.ALL_LIST, args };
     case "!...":
     case "!more":
       return { action: Action.CONTINUE, args };
@@ -66,6 +76,7 @@ export function parseArgs(input: string): Command {
         type: parseAdd(args[0]),
         args: [args[1], args.slice(2).join(" ")],
       };
+    case "!?":
     case "!h":
     case "!how":
       return { action: Action.HELP, args };
@@ -85,6 +96,9 @@ function parseAdd(arg: string): ContentType {
       return ContentType.LORE;
     case "session":
       return ContentType.SESSIONS;
+    case "rule":
+    case "meta":
+      return ContentType.META;
     default:
       throw new Error(`Type **${arg}** not recognized`);
   }

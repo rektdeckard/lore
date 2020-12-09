@@ -5,6 +5,7 @@ export enum DocType {
   PERSON,
   PLACE,
   LORE,
+  META,
 }
 
 export interface Bookmark {
