@@ -14,12 +14,20 @@ export enum Action {
   NONE,
 }
 
+export enum ContentType {
+  PEOPLE = "people",
+  PLACES = "places",
+  LORE = "lore",
+  SESSIONS = "sessions",
+}
+
 export interface Command {
   action: Action;
+  type?: ContentType;
   args: string[];
 }
 
-export const parseArgs = (input: string): Command => {
+export function parseArgs(input: string): Command {
   const [actionString, ...args] = input.split(" ");
   switch (actionString) {
     case "!recap":
@@ -53,11 +61,31 @@ export const parseArgs = (input: string): Command => {
       return { action: Action.CONTINUE, args };
     case "!add":
     case "!new":
-      return { action: Action.ADD, args };
+      return {
+        action: Action.ADD,
+        type: parseAdd(args[0]),
+        args: [args[1], args.slice(2).join(" ")],
+      };
     case "!h":
     case "!how":
       return { action: Action.HELP, args };
     default:
       return { action: Action.NONE, args };
   }
-};
+}
+
+function parseAdd(arg: string): ContentType {
+  switch (arg) {
+    case "person":
+      return ContentType.PEOPLE;
+    case "place":
+      return ContentType.PLACES;
+    case "thing":
+    case "lore":
+      return ContentType.LORE;
+    case "session":
+      return ContentType.SESSIONS;
+    default:
+      throw new Error(`Type **${arg}** not recognized`);
+  }
+}
