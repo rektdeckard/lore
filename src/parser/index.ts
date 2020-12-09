@@ -1,18 +1,16 @@
+export { default as markdownToRich } from "./markdownToRich";
+
 export enum Action {
   RECAP,
   SESSION,
-  SESSION_LIST,
   PERSON,
-  PERSON_LIST,
-  LORE,
-  LORE_LIST,
   PLACE,
-  PLACE_LIST,
-  ALL_LIST,
+  LORE,
   META,
+  ALL,
   CONTINUE,
-  HELP,
   ADD,
+  HELP,
   NONE,
 }
 
@@ -30,8 +28,8 @@ export interface Command {
   args: string[];
 }
 
-export function parseArgs(input: string): Command {
-  const [actionString, ...args] = input.split(" ");
+export function parseCommand(input: string): Command {
+  const [actionString, ...args] = input.trim().split(/ +/);
   switch (actionString) {
     case "!recap":
     case "!last":
@@ -42,30 +40,30 @@ export function parseArgs(input: string): Command {
     case "!sl":
     case "!sn":
       return {
-        action: args.length ? Action.SESSION : Action.SESSION_LIST,
+        action: Action.SESSION,
         args,
       };
     case "!who":
     case "!person":
     case "!people":
     case "!pe":
-      return { action: args.length ? Action.PERSON : Action.PERSON_LIST, args };
+      return { action: Action.PERSON, args };
     case "!what":
     case "!lore":
     case "!lo":
-      return { action: args.length ? Action.LORE : Action.LORE_LIST, args };
+      return { action: Action.LORE, args };
     case "!where":
     case "!places":
     case "!place":
     case "!pl":
-      return { action: args.length ? Action.PLACE : Action.PLACE_LIST, args };
+      return { action: Action.PLACE, args };
     case "!rules":
     case "!meta":
     case "!why":
       return { action: Action.META, args };
     case "!all":
     case "!list":
-      return { action: Action.ALL_LIST, args };
+      return { action: Action.ALL, args };
     case "!...":
     case "!more":
       return { action: Action.CONTINUE, args };
