@@ -3,7 +3,7 @@ import * as Discord from "discord.js";
 import * as API from "./api";
 
 dotenv.config();
-const TOKEN = process.env.DEV_TOKEN;
+const TOKEN = process.env.TOKEN;
 const bot = new Discord.Client();
 bot.login(TOKEN);
 
