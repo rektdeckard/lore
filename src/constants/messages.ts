@@ -80,11 +80,5 @@ We decide to first warn the dwarves before continuing to **Gnomengarde**. Honor 
 
 We take the road west toward the dwarven excavation site. A the end of a deep canyon is a large, decayed black stone gate. We see a ruined settlement ahead. Grenache recognizes the stonework as that of the **Durogar**, some bad dwarf mofos who were obsessed with treasure. Inside the settlement is an entrance cut into the mountain, flanked by 10-foot cloaked dwarf statue.
 
-We bring the warning about the dragon, but it turns out these dwarves have a problem of their own. **Norbis** and **Dazzlin** encountered some kind of...jelly inside. They will give us 2 sending stones to deal with it. Grenache recognizes one of the statues as **Abathar**, the dwarven god of greed. This is a temple to him.
-
-Inside the temple is a hallway leading to a large chamber with 4 columns. There is a secret door to the right. Down the secret passage are dead-end walls marked with dwarven faces. I inspect the northern wall, and find that the dwarf's eyes are buttons. Pushing them opens the wall into the main chamber. Two emeralds fall from the ceiling.
-
-The vaulted ceiling is over 30 feet high here. At the center of the chamber is a dais. The jelly oozes out of a crack in the column. It turns out that slashing damage can split them and cause them to multiply. During the fight, Ekemon and Roman are knocked unconscious by acid jelly punches. Roman gets dick punched and cured by Honor. They defeat the slimes.
-
-We explore hidden secret chambers and Chet gets his hands blown up by trying to steal a giant ruby from a statue of **Abathar**. We decide to get our reward and leave, and run into a band of Orcs on the way out.\
-            `;
+We bring the warning about the dragon, but it turns out these dwarves have a problem of their own. **Norbis** and **Dazzlin** encountered some kind of...jelly inside. They will give us 2 sending stones to deal with it. Grenache recognizes one of the statues as **Abathar**, the dwarven god of greed. This is a temple to him.\
+`;
