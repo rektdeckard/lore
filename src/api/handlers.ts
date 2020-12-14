@@ -1,16 +1,20 @@
 import fs, { PathLike } from "fs";
 import path from "path";
 import { Paths } from "../constants";
-import { ContentType } from "../parser";
+import { Command } from "../parser";
 import { Bookmark, SortCallback } from "./types";
 
 let bookmark: Bookmark | null;
+
+const alphanumericSorter: SortCallback = (a, b) => a.localeCompare(b);
+const dateSorter: SortCallback = (a, b) =>
+  new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
 
 function markdown(data: string): string {
   return `\`\`\`md\n${data}\`\`\``;
 }
 
-function unmark(markdown: string): string {
+export function unmark(markdown: string): string {
   return markdown.replace(/```(md)?\s?(.*)```/gis, "$2");
 }
 
@@ -78,15 +82,13 @@ export function more(): string {
   }
 }
 
-export function sessions(numOrDate?: string): string {
-  const sorter: SortCallback = (a, b) =>
-    new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
-
-  if (!numOrDate) return list(Paths.SESSIONS, sorter, "# Sessions\n\n");
+export function sessions(command?: Command): string {
+  const numOrDate = command?.args[0];
+  if (!numOrDate) return list(Paths.SESSIONS, dateSorter, "# Sessions\n\n");
 
   try {
     const num = numOrDate ? parseInt(numOrDate) - 1 : 0;
-    const sessions = fs.readdirSync(Paths.SESSIONS).sort(sorter);
+    const sessions = fs.readdirSync(Paths.SESSIONS).sort(dateSorter);
     const session = sessions[num ?? sessions.length - 1] ?? "";
     return read(path.join(Paths.SESSIONS, session));
   } catch (e) {
@@ -109,36 +111,41 @@ export function lastSession(): string {
   }
 }
 
-export function people(name?: string): string {
+export function people(command?: Command): string {
+  const name = command?.args[0];
   if (name) return show(name, Paths.PEOPLE);
-  const sorter: SortCallback = (a, b) => a.localeCompare(b);
-  return list(Paths.PEOPLE, sorter, "# People\n\n");
+  return list(Paths.PEOPLE, alphanumericSorter, "# People\n\n");
 }
 
-export function places(name?: string): string {
+export function places(command?: Command): string {
+  const name = command?.args[0];
   if (name) return show(name, Paths.PLACES);
-  const sorter: SortCallback = (a, b) => a.localeCompare(b);
-  return list(Paths.PLACES, sorter, "# Places\n\n");
+  return list(Paths.PLACES, alphanumericSorter, "# Places\n\n");
 }
 
-export function lore(name?: string): string {
+export function lore(command?: Command): string {
+  const name = command?.args[0];
   if (name) return show(name, Paths.LORE);
-  const sorter: SortCallback = (a, b) => a.localeCompare(b);
-  return list(Paths.LORE, sorter, "# Lore\n\n");
+  return list(Paths.LORE, alphanumericSorter, "# Lore\n\n");
 }
 
-export function meta(name?: string): string {
+export function meta(command?: Command): string {
+  const name = command?.args[0];
   if (name) return show(name, Paths.META);
-  const sorter: SortCallback = (a, b) => a.localeCompare(b);
-  return list(Paths.META, sorter, "# Meta\n\n");
+  return list(Paths.META, alphanumericSorter, "# Meta\n\n");
 }
 
-export function add(type: ContentType, args: string[]): string {
+export function add(command: Command): string {
+  const { type, args } = command;
   const [name, heredoc] = args;
 
   try {
     const data = unmark(heredoc);
-    const docPath = path.join(Paths.CONTENT, type, `${name.toLowerCase()}.md`);
+    const docPath = path.join(
+      Paths.CONTENT,
+      type!!,
+      `${name.toLowerCase()}.md`
+    );
     if (fs.existsSync(docPath))
       return markdown(`**${type}/${name}.md** already exists.`);
     fs.writeFileSync(docPath, data);

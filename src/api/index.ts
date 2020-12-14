@@ -1,50 +1,57 @@
 import Discord from "discord.js";
 import { parseCommand, Action, markdownToRich } from "../parser";
 import * as API from "./handlers";
-import { HELP_MESSAGE, TEST_MARKDOWN } from "../constants";
+import { HELP_MESSAGE } from "../constants";
 
 export async function handle(message: Discord.Message): Promise<void> {
   try {
-    const { action, type, args } = parseCommand(message.content);
+    const command = parseCommand(message.content);
+    let content: string = "";
 
-    switch (action) {
+    switch (command.action) {
       case Action.RECAP:
-        message.channel.send(API.lastSession());
+        content = API.lastSession();
         break;
       case Action.SESSION:
-        message.channel.send(API.sessions(args[0]));
+        content = API.sessions(command);
         break;
       case Action.PERSON:
-        message.channel.send(API.people(args[0]));
+        content = API.people(command);
         break;
       case Action.LORE:
-        message.channel.send(API.lore(args[0]));
+        content = API.lore(command);
         break;
       case Action.PLACE:
-        message.channel.send(API.places(args[0]));
+        content = API.places(command);
         break;
       case Action.META:
-        message.channel.send(API.meta(args[0]));
+        content = API.meta(command);
         break;
       case Action.ALL:
-        message.channel.send(API.all());
+        content = API.all();
         break;
       case Action.ADD:
-        message.channel.send(API.add(type!!, args));
+        content = API.add(command);
         break;
       case Action.CONTINUE:
-        message.channel.send(API.more());
+        content = API.more();
         break;
       case Action.HELP:
         message.channel.send(HELP_MESSAGE);
-        break;
+        return;
       case Action.NONE:
-        message.channel.send({
-          embed: markdownToRich(TEST_MARKDOWN),
-        });
         break;
       default:
         break;
+    }
+
+    if (!content) return;
+
+    if (command.args.includes("-r")) {
+      message.channel.send({ embed: markdownToRich(content) });
+    } else {
+      message.channel.send(content);
+      // message.channel.send({ embed: new Discord.MessageEmbed().setTitle("People").setDescription(content) });
     }
   } catch (e) {
     message.channel.send(HELP_MESSAGE);
