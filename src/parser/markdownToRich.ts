@@ -1,5 +1,6 @@
 import Discord from "discord.js";
 import marked from "marked";
+import { unmark } from "../api/handlers";
 
 export default function (markdown: string): Discord.MessageEmbed {
   const message = new Discord.MessageEmbed();
@@ -101,12 +102,12 @@ export default function (markdown: string): Discord.MessageEmbed {
   });
 
   try {
-    marked(markdown);
+    marked(unmark(markdown));
   } catch (e) {
     console.error(e);
   }
 
-  console.log(message);
+  message.setColor("DARK_ORANGE");
   message.setDescription(content.slice(0, 1800));
   return message;
 
