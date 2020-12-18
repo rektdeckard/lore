@@ -1,17 +1,17 @@
 export { default as markdownToRich } from "./markdownToRich";
 
 export enum Action {
-  RECAP,
-  SESSION,
-  PERSON,
-  PLACE,
-  LORE,
-  META,
-  ALL,
-  CONTINUE,
-  ADD,
-  HELP,
-  NONE,
+  RECAP = "Recap",
+  SESSION = "Session",
+  PERSON = "Person",
+  PLACE = "Place",
+  LORE = "Lore",
+  META = "Meta",
+  ALL = "All",
+  CONTINUE = "...continued",
+  ADD = "Add",
+  HELP = "Help",
+  NONE = "None",
 }
 
 export enum ContentType {

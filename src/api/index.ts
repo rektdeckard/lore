@@ -51,7 +51,7 @@ export async function handle(message: Discord.Message): Promise<void> {
       message.channel.send({ embed: markdownToRich(content) });
     } else {
       message.channel.send(content);
-      // message.channel.send({ embed: new Discord.MessageEmbed().setTitle("People").setDescription(content) });
+      // message.channel.send({ embed: new Discord.MessageEmbed().setTitle(command.action).setDescription(content).setFooter("https://tobiasfried.com") });
     }
   } catch (e) {
     message.channel.send(HELP_MESSAGE);
