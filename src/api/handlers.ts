@@ -2,6 +2,7 @@ import fs, { PathLike } from "fs";
 import path from "path";
 import { Paths } from "../constants";
 import { Command } from "../parser";
+import { unmark } from "../utils";
 import { Bookmark, SortCallback } from "./types";
 
 let bookmark: Bookmark | null;
@@ -9,14 +10,6 @@ let bookmark: Bookmark | null;
 const alphanumericSorter: SortCallback = (a, b) => a.localeCompare(b);
 const dateSorter: SortCallback = (a, b) =>
   new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
-
-function markdown(data: string): string {
-  return `\`\`\`md\n${data}\`\`\``;
-}
-
-export function unmark(markdown: string): string {
-  return markdown.replace(/```(md)?\s?(.*)```/gis, "$2");
-}
 
 function read(path: PathLike, page: number = 0): string {
   const file = fs.readFileSync(path).toString("utf-8");
@@ -26,10 +19,10 @@ function read(path: PathLike, page: number = 0): string {
 
   if (hasNextPage) {
     bookmark = { path, page: page + 1 };
-    return markdown(file.slice(thisPage, nextPage) + "...");
+    return file.slice(thisPage, nextPage) + "...";
   } else {
     bookmark = null;
-    return markdown(file.slice(thisPage));
+    return file.slice(thisPage);
   }
 }
 
@@ -43,11 +36,9 @@ function list(
       .readdirSync(docPath)
       .sort(sorter)
       .map((docName, i) => `${i + 1}. ${docName}`);
-    return markdown(
-      heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n")
-    );
+    return heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n");
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
@@ -57,10 +48,10 @@ function show(name: string, docPath: string): string {
     const match = documents.filter((docName) =>
       docName.toLowerCase().includes(name.toLowerCase())
     );
-    if (!match.length) return markdown(`Could not find **${name}**`);
+    if (!match.length) return `Could not find **${name}**`;
     return read(path.join(docPath, match[0]));
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
@@ -78,7 +69,7 @@ export function more(): string {
   if (bookmark) {
     return read(bookmark.path, bookmark.page);
   } else {
-    return markdown("Nothing left to read.");
+    return "Nothing left to read.";
   }
 }
 
@@ -92,7 +83,7 @@ export function sessions(command?: Command): string {
     const session = sessions[num ?? sessions.length - 1] ?? "";
     return read(path.join(Paths.SESSIONS, session));
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
@@ -107,7 +98,7 @@ export function lastSession(): string {
       )[0];
     return read(path.join(Paths.SESSIONS, last));
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
@@ -147,20 +138,20 @@ export function add(command: Command): string {
       `${name.toLowerCase()}.md`
     );
     if (fs.existsSync(docPath))
-      return markdown(`**${type}/${name}.md** already exists.`);
+      return `**${type}/${name}.md** already exists.`;
     fs.writeFileSync(docPath, data);
-    return `added \`${type}/${name}.md\`:\n${markdown(data)}`;
+    return `added \`${type}/${name}.md\``;
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
 export function all() {
   return `\
-${people()}
-${places()}
-${lore()}
-${sessions()}
-${meta()}
+${people()}\n
+${places()}\n
+${lore()}\n
+${sessions()}\n
+${meta()}\n
 `;
 }

@@ -1,6 +1,6 @@
 import Discord from "discord.js";
 import marked from "marked";
-import { unmark } from "../api/handlers";
+import { unmark } from "../utils";
 
 export default function (markdown: string): Discord.MessageEmbed {
   const message = new Discord.MessageEmbed();

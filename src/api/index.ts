@@ -1,6 +1,7 @@
 import Discord from "discord.js";
 import { parseCommand, Action, markdownToRich } from "../parser";
 import * as API from "./handlers";
+import { markdown } from "../utils";
 import { HELP_MESSAGE } from "../constants";
 
 export async function handle(message: Discord.Message): Promise<void> {
@@ -50,7 +51,7 @@ export async function handle(message: Discord.Message): Promise<void> {
     if (command.args.includes("-r")) {
       message.channel.send({ embed: markdownToRich(content) });
     } else {
-      message.channel.send(content);
+      message.channel.send(markdown(content));
       // message.channel.send({ embed: new Discord.MessageEmbed().setTitle(command.action).setDescription(content).setFooter("https://tobiasfried.com") });
     }
   } catch (e) {
