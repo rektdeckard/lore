@@ -19,7 +19,7 @@ bot.registry
     ["sessions", "List or show details for sessions"],
   ])
   .registerDefaultGroups()
-  // .registerDefaultCommands()
+  .registerDefaultCommands()
   // .registerCommandsIn(path.join(__dirname, "commands"));
 
 bot.on("ready", () => {
@@ -29,7 +29,6 @@ bot.on("ready", () => {
 
 bot.on("message", async (message) => {
   if (!message.content.startsWith("!")) return;
-
   API.handle(message);
 });
 
