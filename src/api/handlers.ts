@@ -76,7 +76,7 @@ export function more(): string {
 
 export function sessions(command?: Command): string {
   const numOrDate = command?.args[0];
-  if (!numOrDate) return list(Paths.SESSIONS, dateSorter, "# Sessions\n\n");
+  if (!numOrDate) return list(Paths.SESSIONS, dateSorter, "## Sessions\n\n", true);
 
   try {
     const num = numOrDate ? parseInt(numOrDate) - 1 : 0;
@@ -106,25 +106,25 @@ export function lastSession(): string {
 export function people(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.PEOPLE);
-  return list(Paths.PEOPLE, alphanumericSorter, "# People\n\n");
+  return list(Paths.PEOPLE, alphanumericSorter, "## People\n\n");
 }
 
 export function places(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.PLACES);
-  return list(Paths.PLACES, alphanumericSorter, "# Places\n\n");
+  return list(Paths.PLACES, alphanumericSorter, "## Places\n\n");
 }
 
 export function lore(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.LORE);
-  return list(Paths.LORE, alphanumericSorter, "# Lore\n\n");
+  return list(Paths.LORE, alphanumericSorter, "## Lore\n\n");
 }
 
 export function meta(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.META);
-  return list(Paths.META, alphanumericSorter, "# Meta\n\n");
+  return list(Paths.META, alphanumericSorter, "## Meta\n\n");
 }
 
 export function add(command: Command): string {
