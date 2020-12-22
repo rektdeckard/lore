@@ -49,12 +49,12 @@ export async function handle(message: Discord.Message): Promise<void> {
     if (!content) return;
 
     if (command.args.includes("-r")) {
-      message.channel.send({ embed: markdownToRich(content) });
-    } else {
       message.channel.send(markdown(content));
-      // message.channel.send({ embed: new Discord.MessageEmbed().setTitle(command.action).setDescription(content).setFooter("https://tobiasfried.com") });
+    } else {
+      message.channel.send({ embed: markdownToRich(content) });
     }
   } catch (e) {
+    console.error(e);
     message.channel.send(HELP_MESSAGE);
   }
 }
