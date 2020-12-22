@@ -29,13 +29,14 @@ function read(path: PathLike, page: number = 0): string {
 function list(
   docPath: string,
   sorter: SortCallback,
-  heading: string = ""
+  heading: string = "",
+  numbered: boolean = false,
 ): string {
   try {
     const documents = fs
       .readdirSync(docPath)
       .sort(sorter)
-      .map((docName, i) => `${i + 1}. ${docName}`);
+      .map((docName, i) => `${numbered ? `${i + 1}. ` : "- "} ${docName}`);
     return heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n");
   } catch (e) {
     return e.message;
