@@ -1,16 +1,10 @@
 import Discord from "discord.js";
 import marked, { Token } from "marked";
 import { decode } from "he";
-import { markdown as mark, unmark } from "../utils";
-
-import util from "util";
+import { markdown as mark } from "../utils";
+// import util from "util";
 
 // const NP_SPACE = "​";
-
-interface List {
-  counter: number;
-  accumulator: string[];
-}
 
 export default function (markdown: string): Discord.MessageEmbed {
   const message = new Discord.MessageEmbed();
