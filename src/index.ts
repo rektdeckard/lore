@@ -1,5 +1,5 @@
 import { CommandoClient } from "discord.js-commando";
-import path from "path";
+// import path from "path";
 import * as dotenv from "dotenv";
 import * as API from "./api";
 
