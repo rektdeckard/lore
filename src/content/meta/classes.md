@@ -1,37 +1,49 @@
 # Classes
 
-## Barbarian 
+## Barbarian
+
 [PHB 47](https://tinyurl.com/y4532gtt)
 
-## Bard 
+## Bard
+
 [PHB 52](https://tinyurl.com/y3ky4dwf)
 
-# Cleric
+## Cleric
+
 [PHB 57](https://tinyurl.com/y3qsuqcr)
 
-# Druid:
+## Druid:
+
 [PHB 65](https://tinyurl.com/yxjah6qa)
 
-# Fighter:
+## Fighter:
+
 [PHB 71](https://tinyurl.com/y5rm6wgc)
 
-# Monk
+## Monk
+
 [PHB 77](https://tinyurl.com/y6pdquvl)
 
-# Paladin
+## Paladin
+
 [PHB 83](https://tinyurl.com/y4fdcf7m)
 
-# Ranger
+## Ranger
+
 [PHB 90](https://tinyurl.com/y6423urg)
 
-# Rogue
+## Rogue
+
 [PHB 95](https://tinyurl.com/y3jzwom2)
 
-# Sorcerer
+## Sorcerer
+
 [PHB 100](https://tinyurl.com/yyw4ufhl)
 
-# Warlock
+## Warlock
+
 [PHB 106](https://tinyurl.com/y4fm78xw)
 
-# Wizard
+## Wizard
+
 [PHB 113](https://tinyurl.com/y5vw42mo)
