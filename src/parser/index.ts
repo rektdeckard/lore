@@ -30,7 +30,7 @@ export interface Command {
 
 export function parseCommand(input: string): Command {
   const [actionString, ...args] = input.trim().split(/ +/);
-  switch (actionString) {
+  switch (actionString.toLowerCase()) {
     case "!recap":
     case "!last":
       return { action: Action.RECAP, args };
