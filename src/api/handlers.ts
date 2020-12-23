@@ -2,27 +2,38 @@ import fs, { PathLike } from "fs";
 import path from "path";
 import { Paths } from "../constants";
 import { Command } from "../parser";
+import State from "./state";
 import { unmark } from "../utils";
-import { Bookmark, SortCallback } from "./types";
+import { SortCallback } from "./types";
 
-let bookmark: Bookmark | null;
+const PAGE_SIZE = 1024;
 
 const alphanumericSorter: SortCallback = (a, b) => a.localeCompare(b);
 const dateSorter: SortCallback = (a, b) =>
   new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
 
-function read(path: PathLike, page: number = 0): string {
+function read(path: PathLike): string {
   const file = fs.readFileSync(path).toString("utf-8");
-  const thisPage = page * 1000;
-  const nextPage = thisPage + 1000;
-  const hasNextPage = file.length >= nextPage;
+  return truncateAndBookmarkIfNeeded(file);
+}
 
-  if (hasNextPage) {
-    bookmark = { path, page: page + 1 };
-    return file.slice(thisPage, nextPage) + "...";
+function truncateAndBookmarkIfNeeded(contents: string): string {
+  if (contents.length > PAGE_SIZE) {
+    const parts = contents.split("\n") || contents.split(/\s/);
+    if (!parts.length) throw new Error("Could not split file!");
+
+    let truncated = "";
+    let index = 0;
+    do {
+      truncated += parts[index];
+      index++;
+    } while (truncated.length < PAGE_SIZE);
+
+    State.setBookmark({ contents: parts.slice(index).join("\n") });
+    return truncated + "\n...";
   } else {
-    bookmark = null;
-    return file.slice(thisPage);
+    State.clearBookmark();
+    return contents;
   }
 }
 
@@ -30,14 +41,16 @@ function list(
   docPath: string,
   sorter: SortCallback,
   heading: string = "",
-  numbered: boolean = false,
+  numbered: boolean = false
 ): string {
   try {
     const documents = fs
       .readdirSync(docPath)
       .sort(sorter)
       .map((docName, i) => `${numbered ? `${i + 1}. ` : "- "} ${docName}`);
-    return heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n");
+    return (
+      heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n")
+    );
   } catch (e) {
     return e.message;
   }
@@ -56,19 +69,10 @@ function show(name: string, docPath: string): string {
   }
 }
 
-export function help(): string {
-  return `
-\`!recap\`: Show notes for the last game session.
-\`!who [NAME]\`: List people in the world. With \`[NAME]\`, show info for them.
-\`!what [NAME]\`: List elements of lore in the world. With \`[NAME]\`, show info for a specific one.
-\`!where [NAME]\`: List places in the world. With \`[NAME]\`, show info for a specific place.
-\`!when [NUMBER]\`: List game sessions by date. With \`[NUMBER]\`, show info for that session.
-`;
-}
-
 export function more(): string {
-  if (bookmark) {
-    return read(bookmark.path, bookmark.page);
+  const { contents, title } = State.getBookmark() || {};
+  if (contents) {
+    return `...\n${title ? `# ${title}\n\n` : ""}` + truncateAndBookmarkIfNeeded(contents);
   } else {
     return "Nothing left to read.";
   }
@@ -76,7 +80,8 @@ export function more(): string {
 
 export function sessions(command?: Command): string {
   const numOrDate = command?.args[0];
-  if (!numOrDate) return list(Paths.SESSIONS, dateSorter, "## Sessions\n\n", true);
+  if (!numOrDate)
+    return list(Paths.SESSIONS, dateSorter, "## Sessions\n\n", true);
 
   try {
     const num = numOrDate ? parseInt(numOrDate) - 1 : 0;
@@ -138,8 +143,7 @@ export function add(command: Command): string {
       type!!,
       `${name.toLowerCase()}.md`
     );
-    if (fs.existsSync(docPath))
-      return `**${type}/${name}.md** already exists.`;
+    if (fs.existsSync(docPath)) return `**${type}/${name}.md** already exists.`;
     fs.writeFileSync(docPath, data);
     return `added \`${type}/${name}.md\``;
   } catch (e) {
