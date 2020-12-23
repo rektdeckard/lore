@@ -46,4 +46,5 @@ bot.on("message", async (message) => {
 });
 
 dotenv.config();
-bot.login(process.env.DEV_TOKEN);
+bot.login(process.env.TOKEN);
+// bot.login(process.env.DEV_TOKEN);
