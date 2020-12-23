@@ -13,7 +13,14 @@ const dateSorter: SortCallback = (a, b) =>
   new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
 
 function read(path: PathLike): string {
-  const file = fs.readFileSync(path).toString("utf-8");
+  let file: string;
+
+  if (State.has(path)) {
+    file = State.find(path)!.contents;
+  } else {
+    file = fs.readFileSync(path).toString("utf-8");
+    State.cache({ path, contents: file });
+  }
   return truncateAndBookmarkIfNeeded(file);
 }
 
@@ -57,6 +64,9 @@ function list(
 }
 
 function show(name: string, docPath: string): string {
+  if (State.has(path.join(docPath, name)))
+    return read(path.join(docPath, name));
+
   try {
     const documents = fs.readdirSync(docPath);
     const match = documents.filter((docName) =>
@@ -145,6 +155,11 @@ export function add(command: Command): string {
     );
     if (fs.existsSync(docPath)) return `**${type}/${name}.md** already exists.`;
     fs.writeFileSync(docPath, data);
+
+    State.cache({
+      path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`),
+      contents: data,
+    });
     return `added \`${type}/${name}.md\``;
   } catch (e) {
     return e.message;
