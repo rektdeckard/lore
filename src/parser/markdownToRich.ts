@@ -1,7 +1,8 @@
 import Discord from "discord.js";
 import marked, { Token } from "marked";
 import { decode } from "he";
-import { markdown as mark } from "../utils";
+import { mark } from "../utils";
+import State from "../api/state";
 // import util from "util";
 
 // const NP_SPACE = "​";
@@ -28,18 +29,6 @@ export default function (markdown: string): Discord.MessageEmbed {
     }
   };
 
-  const truncateIfNeeded = () => {
-    while (message.length > 2000) {
-      if (message.fields.length) {
-        message.fields.pop();
-      } else {
-        message.description = message.description?.slice(0, 1800) ?? "";
-      }
-    }
-  };
-
-  // console.log(util.inspect(marked.lexer(markdown), false, 5));
-
   try {
     marked.lexer(markdown).forEach((token) => {
       // @ts-ignore
@@ -59,10 +48,16 @@ export default function (markdown: string): Discord.MessageEmbed {
           if (token.depth === 1) {
             // @ts-ignore
             message.setTitle(token.text);
+            // @ts-ignore
+            State.setBookmark({ ...State.getBookmark(), title: token.text });
           } else {
             inDescription = false;
-            // @ts-ignore
-            message.fields.push({ name: token.text, value: "", inline: false });
+            message.fields.push({
+              // @ts-ignore
+              name: token.text,
+              value: "",
+              inline: false,
+            });
           }
           break;
         // case "hr":
@@ -78,7 +73,7 @@ export default function (markdown: string): Discord.MessageEmbed {
                     `${token.ordered ? `${index + 1}.` : "-"} ${item.text}`
                 )
                 .join("\n")
-            )+ "\n"
+            ) + "\n"
           );
           //   break;
           // case "paragraph":
@@ -91,7 +86,6 @@ export default function (markdown: string): Discord.MessageEmbed {
     });
 
     message.setColor("DARK_ORANGE");
-    truncateIfNeeded();
     return message;
   } catch (e) {
     console.error(e);

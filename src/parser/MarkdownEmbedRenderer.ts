@@ -1,7 +1,7 @@
 import Discord from "discord.js";
 import { MarkedOptions, Slugger } from "marked";
 import { decode } from "he";
-import { markdown as mark } from "../utils";
+import { mark } from "../utils";
 
 interface List {
   counter: number;

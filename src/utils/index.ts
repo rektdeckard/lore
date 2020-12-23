@@ -1,4 +1,4 @@
-export function markdown(data: string): string {
+export function mark(data: string): string {
   return `\`\`\`md\n${data}\`\`\``;
 }
 
