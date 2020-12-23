@@ -2,89 +2,99 @@ import fs, { PathLike } from "fs";
 import path from "path";
 import { Paths } from "../constants";
 import { Command } from "../parser";
-import { Bookmark, SortCallback } from "./types";
+import State from "./state";
+import { unmark } from "../utils";
+import { SortCallback } from "./types";
 
-let bookmark: Bookmark | null;
+const PAGE_SIZE = 1024;
 
 const alphanumericSorter: SortCallback = (a, b) => a.localeCompare(b);
 const dateSorter: SortCallback = (a, b) =>
   new Date(a.split(".")[0]).getTime() - new Date(b.split(".")[0]).getTime();
 
-function markdown(data: string): string {
-  return `\`\`\`md\n${data}\`\`\``;
-}
+function read(path: PathLike): string {
+  let file: string;
 
-export function unmark(markdown: string): string {
-  return markdown.replace(/```(md)?\s?(.*)```/gis, "$2");
-}
-
-function read(path: PathLike, page: number = 0): string {
-  const file = fs.readFileSync(path).toString("utf-8");
-  const thisPage = page * 1000;
-  const nextPage = thisPage + 1000;
-  const hasNextPage = file.length >= nextPage;
-
-  if (hasNextPage) {
-    bookmark = { path, page: page + 1 };
-    return markdown(file.slice(thisPage, nextPage) + "...");
+  if (State.has(path)) {
+    file = State.find(path)!.contents;
   } else {
-    bookmark = null;
-    return markdown(file.slice(thisPage));
+    file = fs.readFileSync(path).toString("utf-8");
+    State.cache({ path, contents: file });
+  }
+  return truncateAndBookmarkIfNeeded(file);
+}
+
+function truncateAndBookmarkIfNeeded(contents: string): string {
+  if (contents.length > PAGE_SIZE) {
+    const parts = contents.split(/\n+/) || contents.split(/\s/);
+    if (!parts.length) throw new Error("Could not split file!");
+
+    let truncated = "";
+    let index = 0;
+    while ((truncated.length + parts[index].length) < PAGE_SIZE && index < parts.length) {
+      truncated += parts[index];
+      index++;
+    }
+
+    State.setBookmark({ contents: parts.slice(index).join("\n") });
+    return truncated + "\n...";
+  } else {
+    State.clearBookmark();
+    return contents;
   }
 }
 
 function list(
   docPath: string,
   sorter: SortCallback,
-  heading: string = ""
+  heading: string = "",
+  numbered: boolean = false
 ): string {
   try {
     const documents = fs
       .readdirSync(docPath)
       .sort(sorter)
-      .map((docName, i) => `${i + 1}. ${docName}`);
-    return markdown(
+      .map((docName, i) => `${numbered ? `${i + 1}. ` : "- "} ${docName}`);
+    return (
       heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n")
     );
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
 function show(name: string, docPath: string): string {
+  if (State.has(path.join(docPath, name)))
+    return read(path.join(docPath, name));
+
   try {
     const documents = fs.readdirSync(docPath);
     const match = documents.filter((docName) =>
       docName.toLowerCase().includes(name.toLowerCase())
     );
-    if (!match.length) return markdown(`Could not find **${name}**`);
+    if (!match.length) return `Could not find **${name}**`;
     return read(path.join(docPath, match[0]));
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
-export function help(): string {
-  return `
-\`!recap\`: Show notes for the last game session.
-\`!who [NAME]\`: List people in the world. With \`[NAME]\`, show info for them.
-\`!what [NAME]\`: List elements of lore in the world. With \`[NAME]\`, show info for a specific one.
-\`!where [NAME]\`: List places in the world. With \`[NAME]\`, show info for a specific place.
-\`!when [NUMBER]\`: List game sessions by date. With \`[NUMBER]\`, show info for that session.
-`;
-}
-
 export function more(): string {
-  if (bookmark) {
-    return read(bookmark.path, bookmark.page);
+  const { contents, title } = State.getBookmark() || {};
+  if (contents) {
+    return (
+      `${title ? `# ${title}\n\n` : ""}...\n\n` +
+      truncateAndBookmarkIfNeeded(contents)
+    );
   } else {
-    return markdown("Nothing left to read.");
+    return "Nothing left to read.";
   }
 }
 
 export function sessions(command?: Command): string {
   const numOrDate = command?.args[0];
-  if (!numOrDate) return list(Paths.SESSIONS, dateSorter, "# Sessions\n\n");
+  if (!numOrDate)
+    return list(Paths.SESSIONS, dateSorter, "## Sessions\n\n", true);
 
   try {
     const num = numOrDate ? parseInt(numOrDate) - 1 : 0;
@@ -92,7 +102,7 @@ export function sessions(command?: Command): string {
     const session = sessions[num ?? sessions.length - 1] ?? "";
     return read(path.join(Paths.SESSIONS, session));
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
@@ -107,32 +117,32 @@ export function lastSession(): string {
       )[0];
     return read(path.join(Paths.SESSIONS, last));
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
 export function people(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.PEOPLE);
-  return list(Paths.PEOPLE, alphanumericSorter, "# People\n\n");
+  return list(Paths.PEOPLE, alphanumericSorter, "## People\n\n");
 }
 
 export function places(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.PLACES);
-  return list(Paths.PLACES, alphanumericSorter, "# Places\n\n");
+  return list(Paths.PLACES, alphanumericSorter, "## Places\n\n");
 }
 
 export function lore(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.LORE);
-  return list(Paths.LORE, alphanumericSorter, "# Lore\n\n");
+  return list(Paths.LORE, alphanumericSorter, "## Lore\n\n");
 }
 
 export function meta(command?: Command): string {
   const name = command?.args[0];
   if (name) return show(name, Paths.META);
-  return list(Paths.META, alphanumericSorter, "# Meta\n\n");
+  return list(Paths.META, alphanumericSorter, "## Meta\n\n");
 }
 
 export function add(command: Command): string {
@@ -146,21 +156,25 @@ export function add(command: Command): string {
       type!!,
       `${name.toLowerCase()}.md`
     );
-    if (fs.existsSync(docPath))
-      return markdown(`**${type}/${name}.md** already exists.`);
+    if (fs.existsSync(docPath)) return `**${type}/${name}.md** already exists.`;
     fs.writeFileSync(docPath, data);
-    return `added \`${type}/${name}.md\`:\n${markdown(data)}`;
+
+    State.cache({
+      path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`),
+      contents: data,
+    });
+    return `added \`${type}/${name}.md\``;
   } catch (e) {
-    return markdown(e.message);
+    return e.message;
   }
 }
 
 export function all() {
   return `\
-${people()}
-${places()}
-${lore()}
-${sessions()}
-${meta()}
+${people()}\n
+${places()}\n
+${lore()}\n
+${sessions()}\n
+${meta()}\n
 `;
 }
