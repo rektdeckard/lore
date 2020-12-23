@@ -26,15 +26,15 @@ function read(path: PathLike): string {
 
 function truncateAndBookmarkIfNeeded(contents: string): string {
   if (contents.length > PAGE_SIZE) {
-    const parts = contents.split("\n") || contents.split(/\s/);
+    const parts = contents.split(/\n+/) || contents.split(/\s/);
     if (!parts.length) throw new Error("Could not split file!");
 
     let truncated = "";
     let index = 0;
-    do {
+    while ((truncated.length + parts[index].length) < PAGE_SIZE && index < parts.length) {
       truncated += parts[index];
       index++;
-    } while (truncated.length < PAGE_SIZE);
+    }
 
     State.setBookmark({ contents: parts.slice(index).join("\n") });
     return truncated + "\n...";
@@ -82,7 +82,10 @@ function show(name: string, docPath: string): string {
 export function more(): string {
   const { contents, title } = State.getBookmark() || {};
   if (contents) {
-    return `...\n${title ? `# ${title}\n\n` : ""}` + truncateAndBookmarkIfNeeded(contents);
+    return (
+      `${title ? `# ${title}\n\n` : ""}...\n\n` +
+      truncateAndBookmarkIfNeeded(contents)
+    );
   } else {
     return "Nothing left to read.";
   }

@@ -86,6 +86,8 @@ export default function (markdown: string): Discord.MessageEmbed {
     });
 
     message.setColor("DARK_ORANGE");
+    if (markdown.endsWith("\n..."))
+      message.setFooter("Type !more to continue");
     return message;
   } catch (e) {
     console.error(e);
