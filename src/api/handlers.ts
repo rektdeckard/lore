@@ -31,7 +31,10 @@ function truncateAndBookmarkIfNeeded(contents: string): string {
 
     let truncated = "";
     let index = 0;
-    while ((truncated.length + parts[index].length) < PAGE_SIZE && index < parts.length) {
+    while (
+      truncated.length + parts[index].length < PAGE_SIZE &&
+      index < parts.length
+    ) {
       truncated += parts[index];
       index++;
     }
@@ -156,7 +159,11 @@ export function add(command: Command): string {
       type!!,
       `${name.toLowerCase()}.md`
     );
+
+    if (path.relative(Paths.CONTENT, docPath).startsWith(".."))
+      return `Can't let you write to **${name.toLowerCase()}**.`;
     if (fs.existsSync(docPath)) return `**${type}/${name}.md** already exists.`;
+
     fs.writeFileSync(docPath, data);
 
     State.cache({
