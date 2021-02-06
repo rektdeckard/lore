@@ -57,7 +57,7 @@ function list(
     const documents = fs
       .readdirSync(docPath)
       .sort(sorter)
-      .map((docName, i) => `${numbered ? `${i + 1}. ` : "- "} ${docName}`);
+      .map((docName, i) => `${numbered ? `${i + 1}.`.padEnd(3, " ") : "- "} ${docName}`);
     return (
       heading + documents.toString().replace(/\.md/g, "").replace(/,/g, "\n")
     );
