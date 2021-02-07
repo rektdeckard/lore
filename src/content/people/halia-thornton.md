@@ -1,5 +1,5 @@
 # Halia Thornton
 
-Leader of the Mining Guild in **Phandalin**, Halia has aspirations to run the city as well. She is unhappy with the job that **Harbin Wester** is doing, despite the positive economic impact he has had on the town. She may have plans to forcfully take over if things don't get better.
+Leader of the Mining Guild in **Phandalin**, Halia is more of a leader to the town than **Harbin Wester**. Despite allusions to the idea, she does not seem interested in taking over the job. She is romantically involved with the wizerd **Sildar Halwinter**.
 
-Halia secretly offered to pay us triple the offered rate (150 gp) for any magical weapon we can bring back from **Gnomengarde**, if it will help defend against the dragon.
+Of late, Halia is deeply concerned about the dragon menacing the area, and secretly offered to pay us triple the offered rate (150 gp) for any magical weapon we can bring back from **Gnomengarde**, if it will help defend against the dragon. On our way to bring back the weapon, we encountered the dragon **Ieva**, who made reference to having met Halia before.
