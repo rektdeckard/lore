@@ -100,8 +100,10 @@ export function parseCommand(input: string): Command {
 function parseAdd(arg: string): ContentType {
   switch (arg) {
     case "person":
+    case "people":
       return ContentType.PEOPLE;
     case "place":
+    case "places":
       return ContentType.PLACES;
     case "thing":
     case "lore":
