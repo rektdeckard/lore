@@ -34,6 +34,12 @@ export async function handle(message: Discord.Message): Promise<void> {
       case Action.ADD:
         content = API.add(command);
         break;
+      case Action.APPEND:
+        content = API.append(command);
+        break;
+      case Action.REPLACE:
+        content = API.replace(command);
+        break;
       case Action.CONTINUE:
         content = API.more();
         break;

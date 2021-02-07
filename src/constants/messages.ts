@@ -39,7 +39,6 @@ export const HELP_MESSAGE = {
       { name: "!when", value: "Session notes", inline: true },
       { name: "!why", value: "Rules and materials", inline: true },
       { name: "!how", value: "Show this help doc", inline: true },
-      // { name: '\u200B', value: '\u200B' },
       {
         name: "!more",
         value: "Show more contents of a truncated file",
@@ -58,6 +57,18 @@ export const HELP_MESSAGE = {
       \`session\`, or \`meta\`. Follows the syntax \`!add <type> <name> <content>\`.\
       Content can be any text, including markdown blocks:\
       ${ADD_EXAMPLE}`
+    )
+    .addFields(
+      {
+        name: "!append",
+        value: "Add to a document, as above",
+        inline: true,
+      },
+      {
+        name: "!replace",
+        value: "Replace contents of document, as above",
+        inline: true,
+      },
     ),
 };
 
