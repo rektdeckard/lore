@@ -67,8 +67,8 @@ function list(
 }
 
 function show(name: string, docPath: string): string {
-  if (State.has(path.join(docPath, name)))
-    return read(path.join(docPath, name));
+  if (State.has(path.join(docPath, `${name}.md`)))
+    return read(path.join(docPath, `${name}.md`));
 
   try {
     const documents = fs.readdirSync(docPath);
