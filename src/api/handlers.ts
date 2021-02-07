@@ -18,7 +18,7 @@ function read(path: PathLike): string {
   if (State.has(path)) {
     file = State.find(path)!.contents;
   } else {
-    file = fs.readFileSync(path).toString("utf-8");
+    file = fs.readFileSync(path).toString();
     State.cache({ path, contents: file });
   }
   return truncateAndBookmarkIfNeeded(file);
@@ -167,7 +167,7 @@ export function add(command: Command): string {
     fs.writeFileSync(docPath, data);
 
     State.cache({
-      path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`),
+      path: docPath,
       contents: data,
     });
     return `Added \`${type}/${name}.md\``;
@@ -190,10 +190,11 @@ export function append(command: Command): string {
 
     if (path.relative(Paths.CONTENT, docPath).startsWith(".."))
       return `Can't let you write to \`${name.toLowerCase()}\``;
-    
     const exists = fs.existsSync(docPath);
+    
     fs.appendFileSync(docPath, data);
-    State.nuke({ path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`), contents: "" });
+
+    State.nuke({ path: docPath, contents: "" });
     return exists ? `Added to \`${type}/${name}.md\`` :  `Created \`${type}/${name}.md\``;
   } catch (e) {
     return e.message;
@@ -219,7 +220,7 @@ export function replace(command: Command): string {
     fs.writeFileSync(docPath, data);
 
     State.cache({
-      path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`),
+      path: docPath,
       contents: data,
     });
     return `Replaced \`${type}/${name}.md\``;
