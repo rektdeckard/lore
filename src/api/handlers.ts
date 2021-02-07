@@ -161,8 +161,8 @@ export function add(command: Command): string {
     );
 
     if (path.relative(Paths.CONTENT, docPath).startsWith(".."))
-      return `Can't let you write to **${name.toLowerCase()}**.`;
-    if (fs.existsSync(docPath)) return `**${type}/${name}.md** already exists.`;
+      return `Can't let you write to \`${name.toLowerCase()}\`.`;
+    if (fs.existsSync(docPath)) return `\`${type}/${name}.md\` already exists.`;
 
     fs.writeFileSync(docPath, data);
 
@@ -170,7 +170,59 @@ export function add(command: Command): string {
       path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`),
       contents: data,
     });
-    return `added \`${type}/${name}.md\``;
+    return `Added \`${type}/${name}.md\``;
+  } catch (e) {
+    return e.message;
+  }
+}
+
+export function append(command: Command): string {
+  const { type, args } = command;
+  const [name, heredoc] = args;
+
+  try {
+    const data = unmark(`\n${heredoc.trim()}`);
+    const docPath = path.join(
+      Paths.CONTENT,
+      type!!,
+      `${name.toLowerCase()}.md`
+    );
+
+    if (path.relative(Paths.CONTENT, docPath).startsWith(".."))
+      return `Can't let you write to \`${name.toLowerCase()}\``;
+    
+    const exists = fs.existsSync(docPath);
+    fs.appendFileSync(docPath, data);
+    State.nuke({ path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`), contents: "" });
+    return exists ? `Added to \`${type}/${name}.md\`` :  `Created \`${type}/${name}.md\``;
+  } catch (e) {
+    return e.message;
+  }
+}
+
+export function replace(command: Command): string {
+  const { type, args } = command;
+  const [name, heredoc] = args;
+
+  try {
+    const data = unmark(heredoc);
+    const docPath = path.join(
+      Paths.CONTENT,
+      type!!,
+      `${name.toLowerCase()}.md`
+    );
+
+    if (path.relative(Paths.CONTENT, docPath).startsWith(".."))
+      return `Can't let you write to \`${name.toLowerCase()}\`.`;
+    if (!fs.existsSync(docPath)) return `\`${type}/${name}.md\` does not exist`;
+
+    fs.writeFileSync(docPath, data);
+
+    State.cache({
+      path: path.join(Paths.CONTENT, type!!, `${name.toLowerCase()}`),
+      contents: data,
+    });
+    return `Replaced \`${type}/${name}.md\``;
   } catch (e) {
     return e.message;
   }

@@ -10,6 +10,8 @@ export enum Action {
   ALL = "All",
   CONTINUE = "...continued",
   ADD = "Add",
+  APPEND = "Append",
+  REPLACE = "Replace",
   HELP = "Help",
   NONE = "None",
 }
@@ -71,6 +73,18 @@ export function parseCommand(input: string): Command {
     case "!new":
       return {
         action: Action.ADD,
+        type: parseAdd(args[0]),
+        args: [args[1], args.slice(2).join(" ")],
+      };
+    case "!append":
+      return {
+        action: Action.APPEND,
+        type: parseAdd(args[0]),
+        args: [args[1], args.slice(2).join(" ")],
+      };
+    case "!replace":
+      return {
+        action: Action.REPLACE,
         type: parseAdd(args[0]),
         args: [args[1], args.slice(2).join(" ")],
       };

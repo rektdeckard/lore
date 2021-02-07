@@ -36,6 +36,10 @@ function cache(entry: Entry) {
   entryCache.set(entry.path, entry);
 }
 
+function nuke(entry: Entry) {
+  entryCache.delete(entry.path!!);
+}
+
 function has(path: PathLike) {
   return entryCache.has(path);
 }
@@ -51,6 +55,7 @@ export default {
   clearBookmark,
   find,
   cache,
+  nuke,
   has,
   clear,
 };
