@@ -101,7 +101,7 @@ export function more(): string {
   }
 }
 
-const dateMatch = /\d\d\d\d-\d+\d+/;
+const dateMatch = /\d\d\d\d-\d+-\d+/;
 
 export function sessions(command?: Command): string {
   const numOrDate = command?.args[0];
