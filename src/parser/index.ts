@@ -12,6 +12,7 @@ export enum Action {
   ADD = "Add",
   APPEND = "Append",
   REPLACE = "Replace",
+  FIND = "Find",
   HELP = "Help",
   NONE = "None",
 }
@@ -73,21 +74,27 @@ export function parseCommand(input: string): Command {
     case "!new":
       return {
         action: Action.ADD,
-        type: parseAdd(args[0]),
-        args: [args[1], args.slice(2).join(" ")],
+        type: parseType(args[0]),
+        args: parseRest(args),
       };
     case "!append":
       return {
         action: Action.APPEND,
-        type: parseAdd(args[0]),
-        args: [args[1], args.slice(2).join(" ")],
+        type: parseType(args[0]),
+        args: parseRest(args),
       };
     case "!replace":
       return {
         action: Action.REPLACE,
-        type: parseAdd(args[0]),
-        args: [args[1], args.slice(2).join(" ")],
+        type: parseType(args[0]),
+        args: parseRest(args),
       };
+    case "!search":
+    case "!find":
+      return {
+        action: Action.FIND,
+        args,
+      }
     case "!?":
     case "!h":
     case "!how":
@@ -97,7 +104,7 @@ export function parseCommand(input: string): Command {
   }
 }
 
-function parseAdd(arg: string): ContentType {
+function parseType(arg: string): ContentType {
   switch (arg) {
     case "person":
     case "people":
@@ -116,4 +123,9 @@ function parseAdd(arg: string): ContentType {
     default:
       throw new Error(`Type **${arg}** not recognized`);
   }
+}
+
+function parseRest(args: string[]): string[] {
+  if (!args.length) throw new Error("Missing arguments");
+  return [args[1], args.slice(2).join(" ")];
 }

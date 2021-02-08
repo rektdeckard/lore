@@ -40,6 +40,9 @@ export async function handle(message: Discord.Message): Promise<void> {
       case Action.REPLACE:
         content = API.replace(command);
         break;
+      case Action.FIND:
+        API.find(command, message);
+        break;
       case Action.CONTINUE:
         content = API.more();
         break;
