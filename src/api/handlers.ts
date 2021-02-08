@@ -257,7 +257,7 @@ export async function find(
   });
 
   stream.on("error", (err: Error) => {
-    return Promise.resolve(err.message);
+    message.channel.send(markdownToRich(err.message));
   });
 
   stream.on("data", (data: MatchData) => {
@@ -290,17 +290,21 @@ export async function find(
       )
       .join("\n\n");
 
-    const content = truncateAndBookmarkIfNeeded(markdown);
-    message.channel.send(markdownToRich(content));
+    if (markdown.length) {
+      const content = truncateAndBookmarkIfNeeded(markdown);
+      message.channel.send(markdownToRich(content));
+    } else {
+      message.channel.send(markdownToRich("No matches found"));
+    }
   });
 }
 
 export function all() {
-  return `\
+  return truncateAndBookmarkIfNeeded(`\
 ${people()}\n
 ${places()}\n
 ${lore()}\n
 ${sessions()}\n
 ${meta()}\n
-`;
+`);
 }
