@@ -35,7 +35,7 @@ function truncateAndBookmarkIfNeeded(contents: string): string {
       truncated.length + parts[index].length < PAGE_SIZE &&
       index < parts.length
     ) {
-      truncated += parts[index] + "\n"
+      truncated += parts[index] + "\n";
       index++;
     }
 
