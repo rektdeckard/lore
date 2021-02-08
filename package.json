@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "watch": "tsc -w",
     "start": "tsc -w & nodemon build/index.js",
-    "start_win": "start /b tsc -w && nodemon build/index.js"
+    "start_win": "start /b tsc -w && nodemon build/index.js --",
+    "dev": "start /b tsc -w && nodemon build/index.js -- -d"
   },
   "author": "Tobias Fried <friedtm@gmail.com>",
   "license": "MIT",

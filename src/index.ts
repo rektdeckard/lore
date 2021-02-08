@@ -46,5 +46,9 @@ bot.on("message", async (message) => {
 });
 
 dotenv.config();
-bot.login(process.env.TOKEN);
-// bot.login(process.env.DEV_TOKEN);
+if (process.argv[2] === "-d") {
+  console.log("Running in dev mode!");
+  bot.login(process.env.DEV_TOKEN);
+} else {
+  bot.login(process.env.TOKEN);
+}
