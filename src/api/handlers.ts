@@ -101,16 +101,27 @@ export function more(): string {
   }
 }
 
+const dateMatch = /\d\d\d\d-\d+\d+/;
+
 export function sessions(command?: Command): string {
   const numOrDate = command?.args[0];
   if (!numOrDate)
     return list(Paths.SESSIONS, dateSorter, "## Sessions\n\n", true);
 
   try {
-    const num = numOrDate ? parseInt(numOrDate) - 1 : 0;
-    const sessions = fs.readdirSync(Paths.SESSIONS).sort(dateSorter);
-    const session = sessions[num ?? sessions.length - 1] ?? "";
-    return read(path.join(Paths.SESSIONS, session));
+    if (dateMatch.test(numOrDate)) {
+      return read(path.join(Paths.SESSIONS, `${numOrDate}.md`));
+    } else {
+      const num = parseInt(numOrDate);
+      if (num) {
+        const sessions = fs.readdirSync(Paths.SESSIONS).sort(dateSorter);
+        if (sessions.length < num) return "That session doesn't exist";
+        const session = sessions[num - 1];
+        return read(path.join(Paths.SESSIONS, session));
+      } else {
+        return "Try getting a session by date or index";
+      }
+    }
   } catch (e) {
     return e.message;
   }
@@ -268,7 +279,6 @@ export async function find(
     const records = matches.reduce<MatchRecord>((acc, { file, line }) => {
       void line;
       const pathParts = file.match(typeAndName);
-      console.log(pathParts);
       if (pathParts && pathParts.length) {
         const [, type, name] = pathParts;
         if (acc[type] && !acc[type].includes(name)) {
