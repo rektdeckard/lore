@@ -266,6 +266,7 @@ export async function find(
 
   stream.on("close", () => {
     const records = matches.reduce<MatchRecord>((acc, { file, line }) => {
+      void line;
       const pathParts = file.match(typeAndName);
       console.log(pathParts);
       if (pathParts && pathParts.length) {
@@ -292,47 +293,7 @@ export async function find(
     const content = truncateAndBookmarkIfNeeded(markdown);
     message.channel.send(markdownToRich(content));
   });
-
-  // walk(Paths.CONTENT, (err, files) => {
-  //   if (err) return Promise.resolve(err.message);
-  //   if (!files) return Promise.resolve("No documents found!");
-
-  //   const matches = shell.grep("-i", pattern, files);
-  //   console.log(matches);
-  //   return Promise.resolve(matches.toString());
-  // });
 }
-
-// async function walk(
-//   dir: string,
-//   done: (err: Nullable<Error>, results?: string[]) => void
-// ) {
-//   let results: string[] = [];
-//   fs.readdir(dir, (err, list) => {
-//     if (err) return done(err);
-
-//     let pending = list.length;
-//     if (!pending) return done(null, results);
-
-//     list.forEach((file) => {
-//       file = path.resolve(dir, file);
-//       fs.stat(file, (err, stat) => {
-//         void err;
-
-//         if (stat && stat.isDirectory()) {
-//           walk(file, (err, res) => {
-//             void err;
-//             if (res) results = [...results, ...res];
-//             if (!--pending) done(null, results);
-//           });
-//         } else {
-//           results.push(file);
-//           if (!--pending) done(null, results);
-//         }
-//       });
-//     });
-//   });
-// }
 
 export function all() {
   return `\
