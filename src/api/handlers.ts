@@ -281,14 +281,14 @@ export async function find(
       const pathParts = file.match(typeAndName);
       if (pathParts && pathParts.length) {
         const [, type, name] = pathParts;
-        if (acc[type] && !acc[type].includes(name)) {
-          acc[type].push(name);
+        if (acc[type]) {
+          if (!acc[type].includes(name)) acc[type].push(name);
         } else {
           acc[type] = [name];
         }
       }
 
-      return acc;
+      return { ...acc };
     }, {});
 
     const markdown = Object.entries(records)
