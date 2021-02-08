@@ -271,7 +271,7 @@ export async function find(
       console.log(pathParts);
       if (pathParts && pathParts.length) {
         const [, type, name] = pathParts;
-        if (acc[type]) {
+        if (acc[type] && !acc[type].includes(name)) {
           acc[type].push(name);
         } else {
           acc[type] = [name];
